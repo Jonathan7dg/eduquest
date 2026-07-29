@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Iniciar Sesión | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card">
+        <h1 class="card-title">¡Bienvenido a EduQuest!</h1>
+        <p class="card-subtitle">Inicia sesión para ingresar a la plataforma de sensibilización y aprendizaje.</p>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                🔓 Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            ¿Aún no tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

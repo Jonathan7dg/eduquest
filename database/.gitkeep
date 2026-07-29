@@ -1,0 +1,3 @@
+# Database
+# Este directorio contiene migraciones y esquemas de la base de datos.
+# Se usará Alembic para gestionar las migraciones.

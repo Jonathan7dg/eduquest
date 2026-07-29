@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Profesor / Educador | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Bienvenido(a), Profe {{ user.first_name|default:user.username }} 👩‍🏫</h1>
+    <p>Centro de creación de trivias y recursos pedagógicos sobre el Derecho y la Dignidad de la Mujer.</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Cuestionarios Creados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <div class="stat-value">{{ stats.total_estudiantes }}</div>
+            <div class="stat-label">Estudiantes en la Plataforma</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div>
+            <div class="stat-value">Fase 1</div>
+            <div class="stat-label">Estado del Entregable</div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome and Theme Content Box -->
+<div class="content-box">
+    <div class="content-title">💜 Módulo Pedagógico: Derecho y Dignidad de la Mujer</div>
+    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem;">
+        Como educador/a en EduQuest, tendrás acceso a herramientas para construir cuestionarios interactivos estilo quiz en vivo. Tus estudiantes responderán preguntas orientadas a promover la igualdad sustantiva, el conocimiento de los derechos humanos de las mujeres y la erradicación de violencias.
+    </p>
+
+    <div style="background-color: #f5f3ff; border-left: 4px solid var(--primary-purple); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <strong style="color: var(--primary-purple);">📌 Estado actual del proyecto (Entregable 1):</strong>
+        <p style="font-size: 0.9rem; color: #475569; margin-top: 0.25rem;">
+            La autenticación de cuentas, validación de formularios y roles de usuario (Profesor/Estudiante/Admin) está <strong>100% activa</strong>. La funcionalidad de creación de preguntas y partidas en vivo estará habilitada en la siguiente fase de juegos.
+        </p>
+    </div>
+
+    <button class="btn btn-secondary" style="width: auto; cursor: not-allowed;" disabled>
+        ➕ Crear Nueva Trivia (Habilitado en Fase 2)
+    </button>
+</div>
+{% endblock %}

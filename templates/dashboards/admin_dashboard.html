@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Administrador | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Panel de Administración General</h1>
+    <p>Gestión centralizada de usuarios, roles y métricas de la plataforma EduQuest.</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div>
+            <div class="stat-value">{{ stats.total_usuarios }}</div>
+            <div class="stat-label">Usuarios Totales</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div>
+            <div class="stat-value">{{ stats.total_estudiantes }}</div>
+            <div class="stat-label">Estudiantes Registrados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">👩‍🏫</div>
+        <div>
+            <div class="stat-value">{{ stats.total_profesores }}</div>
+            <div class="stat-label">Profesores / Educadores</div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Actions Box -->
+<div class="content-box">
+    <div class="content-title">⚡ Acciones de Administrador</div>
+    <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+        Desde este panel puedes supervisar los usuarios registrados en el sistema o administrar la base de datos completa a través del panel nativo de Django.
+    </p>
+    <a href="/admin/" target="_blank" class="btn btn-primary" style="width: auto; display: inline-flex;">
+        🛠️ Abrir Panel Django Admin
+    </a>
+</div>
+
+<!-- Recent Registrations Table -->
+<div class="content-box">
+    <div class="content-title">📋 Últimos Usuarios Registrados</div>
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Rol Asignado</th>
+                    <th>Institución</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in recent_users %}
+                    <tr>
+                        <td><strong>{{ u.username }}</strong></td>
+                        <td>{{ u.get_full_name|default:"-" }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span class="role-tag {% if u.is_superuser or u.role == 'ADMIN' %}role-admin{% elif u.role == 'PROFESOR' %}role-profesor{% else %}role-estudiante{% endif %}">
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td>{{ u.institution|default:"-" }}</td>
+                        <td>{{ u.date_joined|date:"d M Y, H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted);">No hay otros usuarios registrados aún.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

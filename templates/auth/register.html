@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Registro de Usuario | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 540px;">
+    <div class="card">
+        <h1 class="card-title">Crea tu Cuenta</h1>
+        <p class="card-subtitle">Únete como Estudiante o Profesor y promueve los Derechos de las Mujeres.</p>
+
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                        <div style="color: #dc2626; font-size: 0.8rem;">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                        <div style="color: #dc2626; font-size: 0.8rem;">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}" class="form-label">{{ form.role.label }}</label>
+                {{ form.role }}
+                {% if form.role.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.role.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.institution.id_for_label }}" class="form-label">{{ form.institution.label }}</label>
+                {{ form.institution }}
+                {% if form.institution.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.institution.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}" class="form-label">{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem;">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                ✨ Completar Registro
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            ¿Ya tienes una cuenta registrada? <a href="{% url 'login' %}">Inicia sesión</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

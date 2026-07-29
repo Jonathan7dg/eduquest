@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel Estudiante | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>¡Hola, {{ user.first_name|default:user.username }}! 🎓</h1>
+    <p>Bienvenido(a) a EduQuest. Aprende, juega y promueve la dignidad y los derechos de la mujer.</p>
+</div>
+
+<!-- Awareness Card -->
+<div class="content-box" style="background: linear-gradient(135deg, #ffffff, #faf5ff); border: 1px solid #ddd6fe;">
+    <div class="content-title" style="color: var(--primary-purple);">
+        ✊ La Dignidad y los Derechos de la Mujer
+    </div>
+    <p style="color: #475569; line-height: 1.6; margin-bottom: 1rem;">
+        Todas las mujeres y niñas tienen derecho a una vida libre de violencia, acceso a la educación, igualdad de oportunidades y al respeto irrestricto de su dignidad humana. EduQuest transforma este aprendizaje en una experiencia interactiva para todas y todos.
+    </p>
+    
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+        <div style="background: white; border: 1px solid #e9d5ff; padding: 0.85rem 1.25rem; border-radius: 12px; flex: 1; min-width: 200px;">
+            <strong style="color: #6d28d9; display: block; font-size: 0.95rem;">⚖️ Autonomía e Igualdad</strong>
+            <span style="font-size: 0.85rem; color: #64748b;">Derecho a decidir libremente y ser valorada por igual en la sociedad.</span>
+        </div>
+        <div style="background: white; border: 1px solid #fbcfe8; padding: 0.85rem 1.25rem; border-radius: 12px; flex: 1; min-width: 200px;">
+            <strong style="color: #be185d; display: block; font-size: 0.95rem;">🛡️ Respeto y Dignidad</strong>
+            <span style="font-size: 0.85rem; color: #64748b;">Garantizar entornos seguros, libres de discriminación y violencia.</span>
+        </div>
+    </div>
+</div>
+
+<!-- Game Join Box -->
+<div class="content-box">
+    <div class="content-title">🎮 Módulo de Juego y Cuestionarios</div>
+    <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+        Próximamente podrás ingresar con el PIN de juego que te comparta tu profesor/a para responder trivias en vivo y competir en el ranking.
+    </p>
+
+    <div style="display: flex; gap: 0.75rem; max-width: 400px;">
+        <input type="text" class="form-input" placeholder="Ingresa el PIN de la sala" disabled style="background-color: #f8fafc;">
+        <button class="btn btn-primary" style="width: auto; cursor: not-allowed;" disabled>
+            Unirme
+        </button>
+    </div>
+</div>
+{% endblock %}

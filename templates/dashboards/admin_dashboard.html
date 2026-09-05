@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel Administrador | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>Panel de Administración General <span class="icon-inline">{% include 'includes/icons.html' with name='gear' icon_class='icon' %}</span></h1>
+        <p>Gestión centralizada de usuarios, roles y métricas de la plataforma EduQuest.</p>
+    </div>
+    <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="dashboard-mascot" style="height: 110px; width: auto; object-fit: contain; flex-shrink: 0;">
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='users' %}</div>
+        <div>
+            <div class="stat-value">{{ stats.total_usuarios }}</div>
+            <div class="stat-label">Usuarios Totales</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='graduation' %}</div>
+        <div>
+            <div class="stat-value">{{ stats.total_estudiantes }}</div>
+            <div class="stat-label">Estudiantes Registrados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='teacher' %}</div>
+        <div>
+            <div class="stat-value">{{ stats.total_profesores }}</div>
+            <div class="stat-label">Profesores / Educadores</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='shield' %}</div>
+        <div>
+            <div class="stat-value">{{ stats.total_admins }}</div>
+            <div class="stat-label">Administradores</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='books' %}</div>
+        <div>
+            <div class="stat-value">{{ total_trivias }}</div>
+            <div class="stat-label">Trivias Totales</div>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Actions Box -->
+<div class="content-box">
+    <div class="content-title"><span style="color: var(--accent-orange);" class="icon-inline">{% include 'includes/icons.html' with name='zap' icon_class='icon' %}</span> Acciones de Administrador</div>
+    <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+        Desde este panel puedes supervisar los usuarios registrados en el sistema o administrar la base de datos completa a través del panel nativo de Django.
+    </p>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="/admin/" target="_blank" class="btn btn-primary" style="width: auto; display: inline-flex;">
+            {% include 'includes/icons.html' with name='tool' icon_class='icon' %} Abrir Panel Django Admin
+        </a>
+        <a href="{% url 'register' %}" target="_blank" class="btn btn-gold" style="width: auto; display: inline-flex;">
+            {% include 'includes/icons.html' with name='user-plus' icon_class='icon' %} Registrar Usuario
+        </a>
+    </div>
+
+    <div class="feature-chips">
+        <span class="feature-chip">{% include 'includes/icons.html' with name='books' icon_class='icon' %} {{ trivias_publicadas }} trivias publicadas</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='radio' icon_class='icon' %} {{ sesiones_vivo }} partidas en vivo</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='trophy' icon_class='icon' %} {{ intentos_total }} intentos completados</span>
+    </div>
+</div>
+
+<!-- Info Banner -->
+<div class="info-banner info-banner--gold">
+    <span class="icon-inline" style="color: #d97706; font-size: 1.2rem;">{% include 'includes/icons.html' with name='lightbulb' icon_class='icon icon-lg' %}</span>
+    <div>
+        <strong style="color: #b45309;">¿Sabías que?</strong>
+        <span style="font-size: 0.9rem; color: #92400e;"> Puedes gestionar roles, permisos y grupos desde el panel de Django, además de registrar nuevos usuarios directamente desde aquí.</span>
+    </div>
+</div>
+
+<!-- Recent Registrations Table -->
+<div class="content-box">
+    <div class="content-title"><span class="icon-inline" style="color: var(--primary-blue);">{% include 'includes/icons.html' with name='clipboard' icon_class='icon' %}</span> Últimos Usuarios Registrados</div>
+    <div class="table-responsive">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo</th>
+                    <th>Rol Asignado</th>
+                    <th>Institución</th>
+                    <th>Fecha Registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in recent_users %}
+                    <tr>
+                        <td><strong>{{ u.username }}</strong></td>
+                        <td>{{ u.get_full_name|default:"-" }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span class="role-tag {% if u.is_superuser or u.role == 'ADMIN' %}role-admin{% elif u.role == 'PROFESOR' %}role-profesor{% else %}role-estudiante{% endif %}">
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td>{{ u.institution|default:"-" }}</td>
+                        <td>{{ u.date_joined|date:"d M Y, H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted);">No hay otros usuarios registrados aún.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

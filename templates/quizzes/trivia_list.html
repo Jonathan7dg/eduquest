@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mis Trivias | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>Mis Trivias <span class="icon-inline">{% include 'includes/icons.html' with name='list' icon_class='icon' %}</span></h1>
+        <p>Administra tus cuestionarios sobre el Derecho y la Dignidad de la Mujer.</p>
+    </div>
+    <a href="{% url 'quizzes:trivia_create' %}" class="btn btn-gold" style="width: auto; flex-shrink: 0;">
+        {% include 'includes/icons.html' with name='plus' icon_class='icon' %} Crear Nueva Trivia
+    </a>
+</div>
+
+{% if trivias %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='books' %}</div>
+        <div>
+            <div class="stat-value">{{ trivias.count }}</div>
+            <div class="stat-label">Trivias Creadas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='check' %}</div>
+        <div>
+            <div class="stat-value">{{ published_count }}</div>
+            <div class="stat-label">Publicadas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='flag' %}</div>
+        <div>
+            <div class="stat-value">{{ draft_count }}</div>
+            <div class="stat-label">Borradores</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="content-box">
+    <div class="content-title">
+        <span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='books' icon_class='icon' %}</span>
+        Banco de Trivias
+    </div>
+
+    {% if trivias %}
+        <div style="display: grid; gap: 1rem;">
+            {% for trivia in trivias %}
+            <div style="background: #faf9ff; border: 1px solid var(--border-color); border-left: 4px solid {% if trivia.is_published %}var(--accent-orange){% else %}var(--text-muted){% endif %}; border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="min-width: 240px; flex: 1;">
+                    <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+                        <strong style="font-size: 1.05rem; color: #0f172a;">{{ trivia.title }}</strong>
+                        <span class="role-tag {% if trivia.is_published %}role-estudiante{% else %}role-admin{% endif %}" style="text-transform: none; font-size: 0.68rem;">
+                            {% if trivia.is_published %}Publicada{% else %}Borrador{% endif %}
+                        </span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.3rem;">
+                        {{ trivia.description|truncatewords:22 }}
+                    </p>
+                    <div style="display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-muted);">
+                        <span class="icon-inline" style="gap: 0.3rem;">{% include 'includes/icons.html' with name='list' icon_class='icon' %} {{ trivia.total_questions }} preguntas</span>
+                        <span class="icon-inline" style="gap: 0.3rem;">{% include 'includes/icons.html' with name='trophy' icon_class='icon' %} {{ trivia.attempts_count }} intentos</span>
+                        <span class="icon-inline" style="gap: 0.3rem;">{% include 'includes/icons.html' with name='zap' icon_class='icon' %} {{ trivia.total_points }} pts máx.</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+                    <a href="{% url 'quizzes:trivia_detail' pk=trivia.pk %}" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                        {% include 'includes/icons.html' with name='eye' icon_class='icon' %} Ver
+                    </a>
+                    <a href="{% url 'quizzes:trivia_edit' pk=trivia.pk %}" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem;">
+                        {% include 'includes/icons.html' with name='edit' icon_class='icon' %} Editar
+                    </a>
+                    <form method="post" action="{% url 'quizzes:trivia_delete' pk=trivia.pk %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta trivia? Esta acción no se puede deshacer.');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; font-size: 0.85rem; color: #dc2626;">
+                            {% include 'includes/icons.html' with name='trash' icon_class='icon' %} Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">{% include 'includes/icons.html' with name='books' icon_class='icon icon-lg' %}</div>
+            <p style="font-size: 1.05rem; font-weight: 600; color: #334155;">Aún no tienes trivias</p>
+            <p style="margin-top: 0.4rem;">Crea tu primer cuestionario para que tus estudiantes aprendan jugando.</p>
+            <a href="{% url 'quizzes:trivia_create' %}" class="btn btn-primary" style="width: auto; margin-top: 1.25rem; display: inline-flex;">
+                {% include 'includes/icons.html' with name='plus' icon_class='icon' %} Crear mi primera trivia
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

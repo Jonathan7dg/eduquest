@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pregunta {{ progress }} de {{ total }} | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 720px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Trivia: <strong style="color: var(--primary-purple);">{{ trivia.title }}</strong></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Puntos acumulados: <strong style="color: var(--accent-orange);">{{ attempt.score }} / {{ attempt.total_points }}</strong></div>
+        </div>
+        <span class="role-tag role-estudiante" style="font-size: 0.75rem;">Pregunta {{ progress }} de {{ total }}</span>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div style="background: #e2e8f0; border-radius: 999px; height: 10px; margin-bottom: 1.5rem; overflow: hidden;">
+        <div style="height: 100%; width: {% widthratio progress total 100 %}%; background: var(--gradient-brand); border-radius: 999px; transition: width 0.4s ease;"></div>
+    </div>
+
+    <div class="card">
+        <p class="auth-slogan">Respuesta registrada</p>
+        <h1 class="card-title" style="font-size: 1.35rem;">{{ question.text }}</h1>
+
+        <!-- Resultado -->
+        <div class="info-banner" style="justify-content: center; margin-bottom: 1.25rem; border-color: {% if answer.is_correct %}#d1fae5{% else %}#fecaca{% endif %}; background: {% if answer.is_correct %}#ecfdf5{% else %}#fef2f2{% endif %};">
+            {% if answer.is_correct %}
+                <span class="icon-inline" style="color: #059669;">{% include 'includes/icons.html' with name='check' icon_class='icon icon-lg' %}</span>
+                <strong style="color: #059669;">¡Correcto! +{{ answer.points_earned }} pts</strong>
+            {% else %}
+                <span class="icon-inline" style="color: #dc2626;">{% include 'includes/icons.html' with name='x' icon_class='icon icon-lg' %}</span>
+                <strong style="color: #dc2626;">
+                    {% if answer.selected_option %}Incorrecto{% else %}Tiempo agotado{% endif %} · 0 pts
+                </strong>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; gap: 0.8rem;">
+            {% for key, text in question.get_options %}
+                {% if key == question.correct_option %}
+                    <div style="display: flex; align-items: center; gap: 0.8rem; background: #ecfdf5; border: 2px solid #059669; border-radius: 12px; padding: 0.9rem 1.15rem;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #059669; color: white; flex-shrink: 0; font-size: 0.85rem;">✓</span>
+                        <span style="font-weight: 700; color: #059669; flex-shrink: 0;">{{ key }})</span>
+                        <span style="color: #065f46; font-weight: 600;">{{ text }}</span>
+                        <span style="margin-left: auto; font-size: 0.8rem; color: #059669; font-weight: 700; white-space: nowrap;">Correcta</span>
+                    </div>
+                {% elif key == answer.selected_option %}
+                    <div style="display: flex; align-items: center; gap: 0.8rem; background: #fef2f2; border: 2px solid #dc2626; border-radius: 12px; padding: 0.9rem 1.15rem;">
+                        <span style="display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #dc2626; color: white; flex-shrink: 0; font-size: 0.85rem;">✗</span>
+                        <span style="font-weight: 700; color: #dc2626; flex-shrink: 0;">{{ key }})</span>
+                        <span style="color: #991b1b; font-weight: 600;">{{ text }}</span>
+                        <span style="margin-left: auto; font-size: 0.8rem; color: #dc2626; font-weight: 700; white-space: nowrap;">Tu respuesta</span>
+                    </div>
+                {% else %}
+                    <div style="display: flex; align-items: center; gap: 0.8rem; background: #f8fafc; border: 2px solid var(--border-color); border-radius: 12px; padding: 0.9rem 1.15rem; opacity: 0.6;">
+                        <span style="font-weight: 600; color: var(--text-muted); flex-shrink: 0;">{{ key }})</span>
+                        <span style="color: #334155;">{{ text }}</span>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem;">
+            {% if next_q %}
+                <a href="{% url 'quizzes:trivia_play' pk=trivia.pk %}" class="btn btn-primary" style="width: auto;">
+                    {% include 'includes/icons.html' with name='check' icon_class='icon' %} Siguiente pregunta
+                </a>
+            {% else %}
+                <a href="{% url 'quizzes:trivia_results' attempt_id=attempt.pk %}" class="btn btn-gold" style="width: auto;">
+                    {% include 'includes/icons.html' with name='trophy' icon_class='icon' %} Ver resultados
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const isCorrect = {{ answer.is_correct|yesno:"true,false" }};
+    const hasOption = {{ answer.selected_option|yesno:"true,false" }};
+    if (isCorrect) {
+        EduQuestSounds.correct();
+    } else if (hasOption) {
+        EduQuestSounds.incorrect();
+    } else {
+        EduQuestSounds.timeout();
+    }
+})();
+</script>
+{% endblock %}

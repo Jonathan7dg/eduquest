@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resultados | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 720px;">
+    <div class="card" style="text-align: center;">
+        <p class="auth-slogan">Trivia: {{ attempt.trivia.title }}</p>
+        <h1 class="card-title">¡Resultados!</h1>
+
+        <div class="auth-mascot-wrap">
+            <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="auth-mascot">
+        </div>
+
+        <div style="display: inline-block; background: linear-gradient(135deg, #f5f3ff, #eff6ff); border: 1px solid rgba(99, 72, 151, 0.2); border-radius: 16px; padding: 1.5rem 2.5rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Puntaje final</div>
+            <div style="font-size: 2.6rem; font-weight: 800; color: var(--primary-purple);">{{ attempt.score }} <span style="font-size: 1.3rem; color: var(--text-muted);">/ {{ attempt.total_points }}</span></div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">{{ attempt.correct_answers }} de {{ attempt.answers.count }} respuestas correctas</div>
+        </div>
+
+        {% if attempt.total_points > 0 and attempt.score == attempt.total_points %}
+            <div class="info-banner" style="justify-content: center;">
+                <span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='trophy' icon_class='icon icon-lg' %}</span>
+                <strong>¡Puntaje perfecto! Defiendes con orgullo los derechos de la mujer.</strong>
+            </div>
+        {% elif attempt.total_points > 0 and attempt.score > 0 %}
+            <div class="info-banner info-banner--gold" style="justify-content: center;">
+                <span class="icon-inline" style="color: #d97706;">{% include 'includes/icons.html' with name='zap' icon_class='icon icon-lg' %}</span>
+                <strong>¡Muy bien! Sigue aprendiendo sobre igualdad y dignidad.</strong>
+            </div>
+        {% else %}
+            <div class="info-banner info-banner--gold" style="justify-content: center;">
+                <span class="icon-inline" style="color: #d97706;">{% include 'includes/icons.html' with name='lightbulb' icon_class='icon icon-lg' %}</span>
+                <strong>¡Sigue intentándolo! Cada intento refuerza tu aprendizaje.</strong>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Revisión de respuestas -->
+    <div class="content-box">
+        <div class="content-title">
+            <span class="icon-inline" style="color: var(--primary-blue);">{% include 'includes/icons.html' with name='list' icon_class='icon' %}</span>
+            Revisión de tus respuestas
+        </div>
+        <div style="display: grid; gap: 0.9rem;">
+            {% for a in answers %}
+            <div style="background: #faf9ff; border: 1px solid var(--border-color); border-left: 4px solid {% if a.is_correct %}var(--accent-orange){% else %}#dc2626{% endif %}; border-radius: 10px; padding: 0.9rem 1.1rem;">
+                <div style="display: flex; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+                    <strong style="color: #0f172a;">{{ a.question.text }}</strong>
+                    <span style="font-size: 0.85rem; white-space: nowrap;">
+                        {% if a.is_correct %}
+                            <span style="color: #059669; font-weight: 700;">+{{ a.points_earned }} pts</span>
+                        {% else %}
+                            <span style="color: #dc2626; font-weight: 700;">0 pts</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem; font-size: 0.85rem;">
+                    <div style="background: white; border-radius: 8px; padding: 0.4rem 0.7rem; border: 1px solid var(--border-color);">
+                        <strong style="color: var(--primary-purple);">Tu respuesta:</strong>
+                        {% if a.selected_option %}{{ a.selected_option }}) {% for k, t in a.question.get_options %}{% if k == a.selected_option %}{{ t }}{% endif %}{% endfor %}{% else %}Sin respuesta (tiempo agotado){% endif %}
+                        {% if a.is_correct %}<span style="color: #059669;"> ✓</span>{% else %}<span style="color: #dc2626;"> ✗</span>{% endif %}
+                    </div>
+                    <div style="background: #ecfdf5; border-radius: 8px; padding: 0.4rem 0.7rem; border: 1px solid #d1fae5;">
+                        <strong style="color: #059669;">Correcta:</strong> {{ a.question.correct_option }}) {% for k, t in a.question.get_options %}{% if k == a.question.correct_option %}{{ t }}{% endif %}{% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+        <a href="{% url 'quizzes:trivias_list' %}" class="btn btn-primary" style="width: auto;">
+            {% include 'includes/icons.html' with name='list' icon_class='icon' %} Ver más trivias
+        </a>
+        <a href="{% url 'quizzes:trivia_play' pk=attempt.trivia.pk %}" class="btn btn-gold" style="width: auto;">
+            {% include 'includes/icons.html' with name='refresh' icon_class='icon' %} Intentar de nuevo
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary" style="width: auto;">
+            Volver al inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel Estudiante | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>¡Hola, {{ user.first_name|default:user.username }}! <span class="icon-inline">{% include 'includes/icons.html' with name='graduation' icon_class='icon' %}</span></h1>
+        <p>Bienvenido(a) a EduQuest. Aprende, juega y promueve la dignidad y los derechos de la mujer.</p>
+    </div>
+    <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="dashboard-mascot" style="height: 110px; width: auto; object-fit: contain; flex-shrink: 0;">
+</div>
+
+<!-- Perfil Gamificado -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='flag' %}</div>
+        <div>
+            <div class="stat-value">Explorador</div>
+            <div class="stat-label">Tu Nivel Actual</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='zap' %}</div>
+        <div>
+            <div class="stat-value">{{ total_points }}</div>
+            <div class="stat-label">Puntos Ganados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='medal' %}</div>
+        <div>
+            <div class="stat-value">{{ trivias_completed }}</div>
+            <div class="stat-label">Trivias Completadas</div>
+        </div>
+    </div>
+</div>
+
+<!-- Awareness Card -->
+<div class="content-box" style="background: linear-gradient(135deg, #ffffff, #f5f3ff); border: 1px solid rgba(99, 72, 151, 0.2);">
+    <div class="content-title" style="color: var(--primary-purple);">
+        <span class="icon-inline">{% include 'includes/icons.html' with name='heart' icon_class='icon' %}</span> La Dignidad y los Derechos de la Mujer
+    </div>
+    <p style="color: #475569; line-height: 1.6; margin-bottom: 1rem;">
+        Todas las mujeres y niñas tienen derecho a una vida libre de violencia, acceso a la educación, igualdad de oportunidades y al respeto irrestricto de su dignidad humana. EduQuest transforma este aprendizaje en una experiencia interactiva para todas y todos.
+    </p>
+    
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+        <div style="background: white; border: 1px solid var(--border-color); border-left: 4px solid var(--primary-blue); padding: 0.85rem 1.25rem; border-radius: 12px; flex: 1; min-width: 200px; box-shadow: var(--shadow-sm);">
+            <strong style="color: var(--primary-blue); display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">{% include 'includes/icons.html' with name='shield' icon_class='icon' %} Autonomía e Igualdad</strong>
+            <span style="font-size: 0.85rem; color: #64748b;">Derecho a decidir libremente y ser valorada por igual en la sociedad.</span>
+        </div>
+        <div style="background: white; border: 1px solid var(--border-color); border-left: 4px solid var(--accent-orange); padding: 0.85rem 1.25rem; border-radius: 12px; flex: 1; min-width: 200px; box-shadow: var(--shadow-sm);">
+            <strong style="color: var(--accent-orange); display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem;">{% include 'includes/icons.html' with name='heart' icon_class='icon' %} Respeto y Dignidad</strong>
+            <span style="font-size: 0.85rem; color: #64748b;">Garantizar entornos seguros, libres de discriminación y violencia.</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modo Juego -->
+<div class="game-card">
+    <div class="game-dots" aria-hidden="true">
+        <span class="game-dot game-dot--purple"></span>
+        <span class="game-dot game-dot--blue"></span>
+        <span class="game-dot game-dot--orange"></span>
+        <span class="game-dot game-dot--yellow"></span>
+    </div>
+    <div style="flex: 1;">
+        <div class="content-title" style="margin-bottom: 0.25rem;"><span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='gamepad' icon_class='icon' %}</span> Sala de Juego en Vivo</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+            Ingresa con el PIN de juego que te comparta tu profesor/a para responder trivias en vivo y competir en el ranking.
+        </p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="{% url 'quizzes:trivias_list' %}" class="btn btn-primary" style="width: auto;">
+                {% include 'includes/icons.html' with name='books' icon_class='icon' %} Explorar Trivias ({{ published_trivias }})
+            </a>
+            <a href="{% url 'quizzes:live_join' %}" class="btn btn-gold" style="width: auto;">
+                {% include 'includes/icons.html' with name='radio' icon_class='icon' %} Unirme por PIN
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Join Box -->
+<div class="content-box">
+    <div class="content-title"><span class="icon-inline" style="color: var(--primary-blue);">{% include 'includes/icons.html' with name='key' icon_class='icon' %}</span> Ingreso a Trivia en Vivo</div>
+    <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+        Cuando tu profesor/a inicie una trivia, ingresa aquí el PIN de la sala para unirte a la partida.
+    </p>
+
+    <form method="post" action="{% url 'quizzes:live_join' %}" style="display: flex; gap: 0.75rem; max-width: 400px;">
+        {% csrf_token %}
+        <input type="text" name="pin" class="form-input" placeholder="Ingresa el PIN de la sala" required maxlength="6" inputmode="numeric" style="letter-spacing: 0.3rem; font-weight: 700;">
+        <button type="submit" class="btn btn-primary" style="width: auto; flex-shrink: 0;">
+            Unirme {% include 'includes/icons.html' with name='rocket' icon_class='icon' %}
+        </button>
+    </form>
+
+    <div class="feature-chips">
+        <span class="feature-chip">{% include 'includes/icons.html' with name='chart' icon_class='icon' %} Ranking</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='zap' icon_class='icon' %} Puntos</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='medal' icon_class='icon' %} Medallas</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='radio' icon_class='icon' %} Modo en Vivo</span>
+    </div>
+</div>
+{% endblock %}

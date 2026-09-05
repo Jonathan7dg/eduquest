@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ trivia.title }} | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>{{ trivia.title }} <span class="icon-inline">{% include 'includes/icons.html' with name='books' icon_class='icon' %}</span></h1>
+        <p>{{ trivia.description|default:"Sin descripción." }}</p>
+    </div>
+    <span class="role-tag {% if trivia.is_published %}role-estudiante{% else %}role-admin{% endif %}" style="flex-shrink: 0; text-transform: none; font-size: 0.75rem;">
+        {% if trivia.is_published %}Publicada{% else %}Borrador{% endif %}
+    </span>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='list' %}</div>
+        <div>
+            <div class="stat-value">{{ trivia.total_questions }}</div>
+            <div class="stat-label">Preguntas</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='trophy' %}</div>
+        <div>
+            <div class="stat-value">{{ trivia.attempts_count }}</div>
+            <div class="stat-label">Intentos de Estudiantes</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='zap' %}</div>
+        <div>
+            <div class="stat-value">{{ trivia.total_points }}</div>
+            <div class="stat-label">Puntos Máximos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='clock' %}</div>
+        <div>
+            <div class="stat-value">{{ trivia.time_limit }}s</div>
+            <div class="stat-label">Tiempo por Pregunta</div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones -->
+<div class="content-box">
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'quizzes:question_create' trivia_id=trivia.pk %}" class="btn btn-primary" style="width: auto;">
+            {% include 'includes/icons.html' with name='plus' icon_class='icon' %} Agregar Pregunta
+        </a>
+        <a href="{% url 'quizzes:trivia_edit' pk=trivia.pk %}" class="btn btn-secondary" style="width: auto;">
+            {% include 'includes/icons.html' with name='edit' icon_class='icon' %} Editar Trivia
+        </a>
+        <form method="post" action="{% url 'quizzes:trivia_toggle_publish' pk=trivia.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-gold" style="width: auto;">
+                {% if trivia.is_published %}
+                    {% include 'includes/icons.html' with name='x' icon_class='icon' %} Despublicar
+                {% else %}
+                    {% include 'includes/icons.html' with name='send' icon_class='icon' %} Publicar para Estudiantes
+                {% endif %}
+            </button>
+        </form>
+        {% if trivia.is_published and trivia.total_questions > 0 %}
+        <a href="{% url 'quizzes:live_start' pk=trivia.pk %}" class="btn btn-gold" style="width: auto;">
+            {% include 'includes/icons.html' with name='radio' icon_class='icon' %} Iniciar Partida en Vivo
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Preguntas -->
+<div class="content-box">
+    <div class="content-title">
+        <span class="icon-inline" style="color: var(--primary-blue);">{% include 'includes/icons.html' with name='list' icon_class='icon' %}</span>
+        Preguntas de la Trivia
+    </div>
+
+    {% if questions %}
+        <div style="display: grid; gap: 0.9rem;">
+            {% for q in questions %}
+            <div style="background: #faf9ff; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.1rem 1.25rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 220px;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <span class="role-tag role-profesor" style="font-size: 0.7rem;">P{{ forloop.counter }}</span>
+                            <strong style="color: #0f172a;">{{ q.text }}</strong>
+                            <span class="role-tag role-estudiante" style="font-size: 0.7rem; text-transform: none;">{{ q.points }} pts</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.35rem; margin-top: 0.6rem; font-size: 0.85rem; color: #475569;">
+                            {% for key, text in q.get_options %}
+                            <div style="background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 0.4rem 0.7rem;">
+                                <strong style="color: var(--primary-purple);">{% if key == q.correct_option %}✓{% endif %} {{ key }})</strong>
+                                {{ text }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                        <a href="{% url 'quizzes:question_edit' pk=q.pk %}" class="btn btn-secondary" style="width: auto; padding: 0.45rem 0.9rem; font-size: 0.8rem;">
+                            {% include 'includes/icons.html' with name='edit' icon_class='icon' %}
+                        </a>
+                        <form method="post" action="{% url 'quizzes:question_delete' pk=q.pk %}" style="display: inline;" onsubmit="return confirm('¿Eliminar esta pregunta?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-secondary" style="width: auto; padding: 0.45rem 0.9rem; font-size: 0.8rem; color: #dc2626;">
+                                {% include 'includes/icons.html' with name='trash' icon_class='icon' %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+            <div style="font-size: 2.2rem; margin-bottom: 0.5rem;">{% include 'includes/icons.html' with name='lightbulb' icon_class='icon icon-lg' %}</div>
+            <p style="font-weight: 600; color: #334155;">Esta trivia aún no tiene preguntas</p>
+            <p style="margin-top: 0.3rem;">Agrega al menos una pregunta con sus 4 opciones para poder publicarla.</p>
+            <a href="{% url 'quizzes:question_create' trivia_id=trivia.pk %}" class="btn btn-primary" style="width: auto; margin-top: 1rem; display: inline-flex;">
+                {% include 'includes/icons.html' with name='plus' icon_class='icon' %} Agregar primera pregunta
+            </a>
+        </div>
+    {% endif %}
+
+    <div style="margin-top: 1.25rem;">
+        <a href="{% url 'quizzes:trivia_list' %}" class="nav-link icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='list' icon_class='icon' %} Volver a Mis Trivias</a>
+    </div>
+</div>
+{% endblock %}

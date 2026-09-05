@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iniciar Sesión | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="card">
+        <div class="auth-mascot-wrap">
+            <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="auth-mascot">
+        </div>
+        <p class="auth-slogan">Aprende · Juega · Descubre</p>
+
+        <h1 class="card-title">¡Bienvenido de vuelta!</h1>
+        <p class="card-subtitle">Inicia sesión para continuar tu aventura de sensibilización y aprendizaje.</p>
+
+        <div class="auth-badges">
+            <span class="auth-badge">{% include 'includes/icons.html' with name='gamepad' icon_class='icon' %} Trivias</span>
+            <span class="auth-badge">{% include 'includes/icons.html' with name='trophy' icon_class='icon' %} Ranking</span>
+            <span class="auth-badge">{% include 'includes/icons.html' with name='shield' icon_class='icon' %} Derechos</span>
+        </div>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div style="color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">
+                {% include 'includes/icons.html' with name='lock' icon_class='icon' %} Iniciar Sesión
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            ¿Aún no tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

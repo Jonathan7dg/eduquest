@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EduQuest | Derecho y Dignidad de la Mujer{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/mascot.png' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}?v=3">
+</head>
+<body>
+
+    <!-- Barra superior animada -->
+    <div class="top-bar"></div>
+
+    <!-- Fondo ambientado con blobs -->
+    <div class="bg-decoration" aria-hidden="true">
+        <div class="bg-blob bg-blob--purple"></div>
+        <div class="bg-blob bg-blob--blue"></div>
+        <div class="bg-blob bg-blob--orange"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'dashboard' %}" class="brand-logo">
+                <img src="{% static 'images/logo_yellow_blue_transparent.png' %}" alt="EduQuest Logo" style="height: 38px; width: auto; object-fit: contain;">
+                <span class="brand-badge">Dignidad y Derecho</span>
+            </a>
+
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <div class="user-pill">
+                        <span style="display: inline-flex; align-items: center; gap: 0.4rem;">
+                            {% include 'includes/icons.html' with name='user' icon_class='icon' %}
+                            {{ user.first_name|default:user.username }}
+                        </span>
+                        <span class="role-tag {% if user.is_superuser or user.role == 'ADMIN' %}role-admin{% elif user.role == 'PROFESOR' %}role-profesor{% else %}role-estudiante{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                    </div>
+
+                    {% if user.is_superuser or user.role == 'ADMIN' %}
+                        <a href="/admin/" target="_blank" class="nav-link icon-inline">{% include 'includes/icons.html' with name='gear' icon_class='icon' %} Django Admin</a>
+                    {% endif %}
+
+                    {% if user.role == 'PROFESOR' %}
+                        <a href="{% url 'quizzes:trivia_list' %}" class="nav-link icon-inline">{% include 'includes/icons.html' with name='books' icon_class='icon' %} Mis Trivias</a>
+                    {% elif user.role == 'ESTUDIANTE' %}
+                        <a href="{% url 'quizzes:trivias_list' %}" class="nav-link icon-inline">{% include 'includes/icons.html' with name='gamepad' icon_class='icon' %} Trivias</a>
+                    {% endif %}
+
+                    <a href="{% url 'logout' %}" class="nav-link icon-inline" style="color: #dc2626;">{% include 'includes/icons.html' with name='log-out' icon_class='icon' %} Cerrar Sesión</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link">Iniciar Sesión</a>
+                    <a href="{% url 'register' %}" class="nav-link btn btn-primary" style="padding: 0.4rem 1rem; width: auto;">Registrarse</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Body -->
+    <main class="main-content">
+        <!-- Huellas del dino decorativas en las esquinas (paleta de colores) -->
+        <span class="dino-paw dino-paw--tl" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="56" height="56"><ellipse cx="20" cy="32" rx="10" ry="7" fill="#634897"/><ellipse cx="8" cy="17" rx="5" ry="7" fill="#634897"/><ellipse cx="20" cy="11" rx="5" ry="8" fill="#634897"/><ellipse cx="32" cy="17" rx="5" ry="7" fill="#634897"/></svg>
+        </span>
+        <span class="dino-paw dino-paw--tr" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="56" height="56"><ellipse cx="20" cy="32" rx="10" ry="7" fill="#1d71b8"/><ellipse cx="8" cy="17" rx="5" ry="7" fill="#1d71b8"/><ellipse cx="20" cy="11" rx="5" ry="8" fill="#1d71b8"/><ellipse cx="32" cy="17" rx="5" ry="7" fill="#1d71b8"/></svg>
+        </span>
+        <span class="dino-paw dino-paw--bl" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="56" height="56"><ellipse cx="20" cy="32" rx="10" ry="7" fill="#f7a82d"/><ellipse cx="8" cy="17" rx="5" ry="7" fill="#f7a82d"/><ellipse cx="20" cy="11" rx="5" ry="8" fill="#f7a82d"/><ellipse cx="32" cy="17" rx="5" ry="7" fill="#f7a82d"/></svg>
+        </span>
+        <span class="dino-paw dino-paw--br" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="56" height="56"><ellipse cx="20" cy="32" rx="10" ry="7" fill="#ffdc04"/><ellipse cx="8" cy="17" rx="5" ry="7" fill="#ffdc04"/><ellipse cx="20" cy="11" rx="5" ry="8" fill="#ffdc04"/><ellipse cx="32" cy="17" rx="5" ry="7" fill="#ffdc04"/></svg>
+        </span>
+
+        <!-- Messages System -->
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+                        {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}⚠️{% else %}ℹ️{% endif %}
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><strong>EduQuest 2026</strong> <span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='gamepad' icon_class='icon' %}</span> — Plataforma Educativa Gamificada sobre el Derecho y la Dignidad de la Mujer</p>
+        <p style="font-size: 0.8rem; margin-top: 0.25rem;">Aprende · Juega · Descubre</p>
+    </footer>
+
+    <script src="{% static 'js/sounds.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

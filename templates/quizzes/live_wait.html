@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Esperando partida | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 560px; text-align: center;">
+    <div class="card" style="padding: 2.5rem;">
+        <div class="auth-mascot-wrap">
+            <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="auth-mascot">
+        </div>
+        <p class="auth-slogan">Sala {{ session.pin }}</p>
+        <h1 class="card-title">{{ session.trivia.title }}</h1>
+
+        <div class="game-dots" style="justify-content: center; margin: 1.25rem 0 0.5rem;">
+            <span class="game-dot game-dot--purple"></span>
+            <span class="game-dot game-dot--blue"></span>
+            <span class="game-dot game-dot--orange"></span>
+            <span class="game-dot game-dot--yellow"></span>
+        </div>
+
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Tu profesor/a aún no ha iniciado la partida. <strong>Espera un momento...</strong></p>
+
+        <div class="info-banner" style="justify-content: center;">
+            <span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='radio' icon_class='icon icon-lg' %}</span>
+            <span>Cuando inicie, la partida comenzará automáticamente en esta pantalla.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+const POLL_INTERVAL = 2500;
+const stateUrl = "{% url 'quizzes:live_state' pk=session.pk %}";
+
+async function pollState() {
+    try {
+        const res = await fetch(stateUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (data.status === 'ACTIVE') {
+            window.location.href = "{% url 'quizzes:live_play' pk=session.pk %}";
+        } else if (data.status === 'FINISHED') {
+            window.location.href = "{% url 'quizzes:live_results' pk=session.pk %}";
+        }
+    } catch (e) {
+        // reintenta en el siguiente ciclo
+    }
+}
+setInterval(pollState, POLL_INTERVAL);
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel Profesor / Educador | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>Bienvenido(a), Profe {{ user.first_name|default:user.username }} <span class="icon-inline">{% include 'includes/icons.html' with name='teacher' icon_class='icon' %}</span></h1>
+        <p>Centro de creación de trivias y recursos pedagógicos sobre el Derecho y la Dignidad de la Mujer.</p>
+    </div>
+    <img src="{% static 'images/mascot.png' %}" alt="Mascota EduQuest" class="dashboard-mascot" style="height: 110px; width: auto; object-fit: contain; flex-shrink: 0;">
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='books' %}</div>
+        <div>
+            <div class="stat-value">{{ my_trivias_count }}</div>
+            <div class="stat-label">Cuestionarios Creados</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='users' %}</div>
+        <div>
+            <div class="stat-value">{{ stats.total_estudiantes }}</div>
+            <div class="stat-label">Estudiantes en la Plataforma</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">{% include 'includes/icons.html' with name='send' %}</div>
+        <div>
+            <div class="stat-value">{{ my_trivias_published }}</div>
+            <div class="stat-label">Trivias Publicadas</div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome and Theme Content Box -->
+<div class="content-box">
+    <div class="content-title"><span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='heart' icon_class='icon' %}</span> Módulo Pedagógico: Derecho y Dignidad de la Mujer</div>
+    <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 1.25rem;">
+        Como educador/a en EduQuest, tendrás acceso a herramientas para construir cuestionarios interactivos estilo quiz en vivo. Tus estudiantes responderán preguntas orientadas a promover la igualdad sustantiva, el conocimiento de los derechos humanos de las mujeres y la erradicación de violencias.
+    </p>
+
+    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'quizzes:trivia_create' %}" class="btn btn-primary" style="width: auto;">
+            {% include 'includes/icons.html' with name='plus' icon_class='icon' %} Crear Nueva Trivia
+        </a>
+        <a href="{% url 'quizzes:trivia_list' %}" class="btn btn-gold" style="width: auto;">
+            {% include 'includes/icons.html' with name='radio' icon_class='icon' %} Gestionar Trivias y Partidas
+        </a>
+    </div>
+
+    <div class="feature-chips">
+        <span class="feature-chip">{% include 'includes/icons.html' with name='chart' icon_class='icon' %} Seguimiento de Notas</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='users' icon_class='icon' %} Gestión de Grupos</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='books' icon_class='icon' %} Banco de Preguntas</span>
+        <span class="feature-chip">{% include 'includes/icons.html' with name='trophy' icon_class='icon' %} Tabla de Ranking</span>
+    </div>
+</div>
+
+<!-- Últimas trivias -->
+<div class="content-box">
+    <div class="content-title"><span class="icon-inline" style="color: var(--primary-blue);">{% include 'includes/icons.html' with name='list' icon_class='icon' %}</span> Mis Trivias Recientes</div>
+    {% if trivias_recent %}
+        <div style="display: grid; gap: 0.75rem;">
+            {% for t in trivias_recent %}
+            <div style="background: #faf9ff; border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem 1.1rem; display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div>
+                    <strong style="color: #0f172a;">{{ t.title }}</strong>
+                    <span class="role-tag {% if t.is_published %}role-estudiante{% else %}role-admin{% endif %}" style="text-transform: none; font-size: 0.65rem; margin-left: 0.5rem;">{% if t.is_published %}Publicada{% else %}Borrador{% endif %}</span>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ t.total_questions }} preguntas · {{ t.attempts_count }} intentos</div>
+                </div>
+                <a href="{% url 'quizzes:trivia_detail' pk=t.pk %}" class="btn btn-secondary" style="width: auto; padding: 0.45rem 0.9rem; font-size: 0.8rem;">
+                    {% include 'includes/icons.html' with name='eye' icon_class='icon' %} Ver
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Aún no has creado trivias. <a href="{% url 'quizzes:trivia_create' %}" style="color: var(--primary-purple); font-weight: 600;">¡Crea tu primera trivia!</a></p>
+    {% endif %}
+</div>
+{% endblock %}

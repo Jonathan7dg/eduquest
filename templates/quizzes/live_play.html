@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Jugando: {{ session.trivia.title }} | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 720px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Trivia: <strong style="color: var(--primary-purple);">{{ session.trivia.title }}</strong></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Tu puntaje: <strong style="color: var(--accent-orange);" id="my-score">{{ participant.score }} pts</strong></div>
+        </div>
+        <span class="role-tag role-estudiante" style="font-size: 0.75rem;">Pregunta {{ session.current_question|add:"1" }} de {{ total }}</span>
+    </div>
+
+    <div id="question-card" class="card">
+        {% if current %}
+            {% if my_answer %}
+                {% if session.revealed %}
+                    <!-- Respuesta revelada: mostrar resultado -->
+                    <div style="text-align: center; padding: 1rem 0;">
+                        <p class="auth-slogan">Pregunta {{ session.current_question|add:"1" }}</p>
+                        <h1 class="card-title" style="font-size: 1.25rem;">{{ current.text }}</h1>
+                        <div style="display: inline-block; border-radius: 14px; padding: 1rem 1.75rem; margin: 1rem 0; {% if my_answer.is_correct %}background: #ecfdf5; border: 2px solid #059669;{% else %}background: #fef2f2; border: 2px solid #dc2626;{% endif %}">
+                            <div style="font-size: 3rem;">{% if my_answer.is_correct %}🎉{% else %}😔{% endif %}</div>
+                            <div style="font-size: 1.4rem; font-weight: 800; {% if my_answer.is_correct %}color: #059669;{% else %}color: #dc2626;{% endif %}">
+                                {% if my_answer.is_correct %}+{{ my_answer.points_earned }} puntos{% else %}Incorrecta{% endif %}
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; max-width: 480px; margin: 0 auto 1rem; text-align: left; font-size: 0.9rem;">
+                            <div style="background: white; border-radius: 10px; padding: 0.6rem 0.9rem; border: 1px solid var(--border-color);">
+                                <strong style="color: var(--primary-purple);">Tu respuesta:</strong> {{ my_answer.selected_option }}) {% for k, t in current.get_options %}{% if k == my_answer.selected_option %}{{ t }}{% endif %}{% endfor %}
+                            </div>
+                            <div style="background: #ecfdf5; border-radius: 10px; padding: 0.6rem 0.9rem; border: 1px solid #d1fae5;">
+                                <strong style="color: #059669;">Correcta:</strong> {{ current.correct_option }}) {% for k, t in current.get_options %}{% if k == current.correct_option %}{{ t }}{% endif %}{% endfor %}
+                            </div>
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Espera la siguiente pregunta...</p>
+                        <div class="game-dots" style="justify-content: center; margin-top: 0.5rem;">
+                            <span class="game-dot game-dot--purple"></span>
+                            <span class="game-dot game-dot--blue"></span>
+                            <span class="game-dot game-dot--orange"></span>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Respuesta registrada: esperando revelación -->
+                    <div style="text-align: center; padding: 1rem 0;">
+                        <p class="auth-slogan">¡Respuesta enviada!</p>
+                        <div style="font-size: 3rem; margin: 0.75rem 0; color: var(--primary-purple);">{% include 'includes/icons.html' with name='check' icon_class='icon icon-lg' %}</div>
+                        <p style="color: var(--text-muted);">
+                            Elegiste <strong style="color: var(--primary-purple);">{{ my_answer.selected_option }}</strong>.
+                            Espera a que tu profesor/a revele la respuesta correcta...
+                        </p>
+                        <div class="game-dots" style="justify-content: center; margin-top: 1rem;">
+                            <span class="game-dot game-dot--purple"></span>
+                            <span class="game-dot game-dot--blue"></span>
+                            <span class="game-dot game-dot--orange"></span>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                {% if session.revealed %}
+                    <!-- No respondiste a tiempo -->
+                    <div style="text-align: center; padding: 1rem 0;">
+                        <p class="auth-slogan">Pregunta {{ session.current_question|add:"1" }}</p>
+                        <h1 class="card-title" style="font-size: 1.25rem;">{{ current.text }}</h1>
+                        <div style="display: inline-block; border-radius: 14px; padding: 1rem 1.75rem; margin: 1rem 0; background: #fef2f2; border: 2px solid #dc2626;">
+                            <div style="font-size: 2rem;">⏰</div>
+                            <div style="font-size: 1.2rem; font-weight: 800; color: #dc2626;">No alcanzaste a responder</div>
+                        </div>
+                        <div style="background: #ecfdf5; border-radius: 10px; padding: 0.6rem 0.9rem; border: 1px solid #d1fae5; max-width: 480px; margin: 0 auto; text-align: left; font-size: 0.9rem;">
+                            <strong style="color: #059669;">Correcta:</strong> {{ current.correct_option }}) {% for k, t in current.get_options %}{% if k == current.correct_option %}{{ t }}{% endif %}{% endfor %}
+                        </div>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 1rem;">Espera la siguiente pregunta...</p>
+                        <div class="game-dots" style="justify-content: center; margin-top: 0.5rem;">
+                            <span class="game-dot game-dot--purple"></span>
+                            <span class="game-dot game-dot--blue"></span>
+                            <span class="game-dot game-dot--orange"></span>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Pregunta activa para responder -->
+                    <p class="auth-slogan">Pregunta {{ session.current_question|add:"1" }}</p>
+                    <h1 class="card-title" style="font-size: 1.35rem;">{{ current.text }}</h1>
+
+                    <!-- Temporizador -->
+                    <div style="margin-bottom: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                            <span>Tiempo restante</span>
+                            <strong style="color: var(--primary-blue);" id="timer-text">--</strong>
+                        </div>
+                        <div style="background: #e2e8f0; border-radius: 999px; height: 10px; overflow: hidden;">
+                            <div id="timer-bar" style="height: 100%; width: 100%; background: linear-gradient(90deg, var(--primary-blue), var(--primary-purple)); border-radius: 999px; transition: width 0.25s linear;"></div>
+                        </div>
+                    </div>
+
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+                        Vale hasta <strong>{{ current.points }} puntos</strong>. ¡Elige rápido!
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
+                            {% for key, text in current.get_options %}
+                            <label style="display: flex; align-items: center; gap: 0.7rem; background: #f8fafc; border: 2px solid var(--border-color); border-radius: 12px; padding: 0.85rem 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--primary-blue)'; this.style.background='#eff6ff';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='#f8fafc';">
+                                <input type="radio" name="option" value="{{ key }}" required style="width: 18px; height: 18px; accent-color: var(--primary-blue); flex-shrink: 0;">
+                                <strong style="color: var(--primary-blue); flex-shrink: 0;">{{ key }})</strong>
+                                <span style="color: #334155; font-size: 0.95rem;">{{ text }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                            {% include 'includes/icons.html' with name='check' icon_class='icon' %} Enviar Respuesta
+                        </button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% else %}
+            <div style="text-align: center; padding: 2rem 0; color: var(--text-muted);">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">{% include 'includes/icons.html' with name='radio' icon_class='icon icon-lg' %}</div>
+                <p style="font-weight: 600; color: #334155;">Preparando la partida...</p>
+                <p style="margin-top: 0.4rem;">La primera pregunta aparecerá aquí en unos segundos.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+const POLL_INTERVAL = 2500;
+const stateUrl = "{% url 'quizzes:live_state' pk=session.pk %}";
+const myCurrentQuestion = {{ session.current_question }};
+const myRevealed = {{ session.revealed|yesno:"true,false" }};
+const timeLimit = {{ session.trivia.time_limit }};
+
+const timerBar = document.getElementById('timer-bar');
+const timerText = document.getElementById('timer-text');
+let timerStartedMs = null;
+let lastTickSecond = null;
+
+function renderTimer() {
+    if (!timerBar || timerStartedMs === null) return;
+    const elapsed = (Date.now() - timerStartedMs) / 1000;
+    const remaining = Math.max(0, timeLimit - elapsed);
+    timerBar.style.width = (remaining / timeLimit * 100) + '%';
+    timerText.textContent = Math.ceil(remaining) + 's';
+    if (remaining <= 5) {
+        timerText.style.color = '#dc2626';
+        timerBar.style.background = '#dc2626';
+    }
+    const sec = Math.ceil(remaining);
+    if (lastTickSecond !== sec) {
+        lastTickSecond = sec;
+        if (sec <= 5) {
+            EduQuestSounds.tickUrgent();
+        } else {
+            EduQuestSounds.tick();
+        }
+    }
+}
+setInterval(renderTimer, 250);
+
+document.addEventListener('submit', function (e) {
+    if (e.target && e.target.method === 'post') {
+        EduQuestSounds.click();
+    }
+});
+
+// Sonido de resultado al revelar la respuesta
+if (myRevealed) {
+    if ({{ my_answer|yesno:"true,false" }}) {
+        if ({{ my_answer.is_correct|yesno:"true,false" }}) {
+            EduQuestSounds.correct();
+        } else {
+            EduQuestSounds.incorrect();
+        }
+    } else {
+        EduQuestSounds.timeout();
+    }
+}
+
+async function pollState() {
+    try {
+        const res = await fetch(stateUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await res.json();
+        if (data.status === 'WAITING') {
+            window.location.href = "{% url 'quizzes:live_wait' pk=session.pk %}";
+            return;
+        }
+        if (data.status === 'FINISHED') {
+            window.location.href = "{% url 'quizzes:live_results' pk=session.pk %}";
+            return;
+        }
+        if (data.status === 'ACTIVE') {
+            if (data.question_started_ms) {
+                timerStartedMs = data.question_started_ms;
+                renderTimer();
+            }
+            const questionChanged = data.current_index !== myCurrentQuestion;
+            const nowRevealed = data.revealed !== myRevealed;
+            if (questionChanged || nowRevealed) {
+                window.location.reload();
+                return;
+            }
+        }
+    } catch (e) {
+        // reintenta en el siguiente ciclo
+    }
+}
+pollState();
+setInterval(pollState, POLL_INTERVAL);
+</script>
+{% endblock %}

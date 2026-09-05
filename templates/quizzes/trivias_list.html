@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Trivias Disponibles | EduQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+    <div>
+        <h1>Trivias Disponibles <span class="icon-inline">{% include 'includes/icons.html' with name='gamepad' icon_class='icon' %}</span></h1>
+        <p>Elige un cuestionario y aprende sobre el Derecho y la Dignidad de la Mujer mientras ganas puntos.</p>
+    </div>
+    <a href="{% url 'quizzes:live_join' %}" class="btn btn-gold" style="width: auto; flex-shrink: 0;">
+        {% include 'includes/icons.html' with name='radio' icon_class='icon' %} Unirme a Partida en Vivo
+    </a>
+</div>
+
+{% if results %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;">
+        {% for item in results %}
+        <div class="content-box" style="display: flex; flex-direction: column; margin-bottom: 0;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem;">
+                <span class="stat-icon" style="width: 44px; height: 44px; background: linear-gradient(135deg, #ede9fe, #f5f3ff); color: var(--primary-purple);">
+                    {% include 'includes/icons.html' with name='books' %}
+                </span>
+                <div>
+                    <strong style="color: #0f172a; font-size: 1.05rem;">{{ item.trivia.title }}</strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">
+                        {{ item.trivia.total_questions }} preguntas · {{ item.trivia.total_points }} pts
+                    </div>
+                </div>
+            </div>
+
+            <p style="color: var(--text-muted); font-size: 0.88rem; flex: 1;">
+                {{ item.trivia.description|default:"Sin descripción."|truncatewords:26 }}
+            </p>
+
+            {% if item.best %}
+            <div style="background: #f5f3ff; border-radius: 10px; padding: 0.6rem 1rem; margin: 0.9rem 0; display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem;">
+                <span class="icon-inline" style="color: var(--primary-purple);">{% include 'includes/icons.html' with name='award' icon_class='icon' %}</span>
+                <strong style="color: var(--primary-purple);">Tu mejor resultado: {{ item.best.score }}/{{ item.best.total_points }} pts</strong>
+            </div>
+            {% endif %}
+
+            <a href="{% url 'quizzes:trivia_play' pk=item.trivia.pk %}" class="btn btn-primary" style="width: auto; display: inline-flex; margin-top: auto;">
+                {% include 'includes/icons.html' with name='play' icon_class='icon' %} Jugar
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="content-box" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">{% include 'includes/icons.html' with name='books' icon_class='icon icon-lg' %}</div>
+        <p style="font-size: 1.05rem; font-weight: 600; color: #334155;">No hay trivias publicadas todavía</p>
+        <p style="margin-top: 0.4rem;">Tu profesor/a aún no ha publicado cuestionarios. ¡Vuelve pronto!</p>
+        <a href="{% url 'quizzes:live_join' %}" class="btn btn-gold" style="width: auto; margin-top: 1.25rem; display: inline-flex;">
+            {% include 'includes/icons.html' with name='radio' icon_class='icon' %} Unirme a una partida en vivo
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

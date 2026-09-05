@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pregunta {{ progress }} de {{ total }} | EduQuest{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper" style="max-width: 720px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Trivia: <strong style="color: var(--primary-purple);">{{ trivia.title }}</strong></div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">Puntos acumulados: <strong style="color: var(--accent-orange);">{{ attempt.score }} / {{ attempt.total_points }}</strong></div>
+        </div>
+        <span class="role-tag role-estudiante" style="font-size: 0.75rem;">Pregunta {{ progress }} de {{ total }}</span>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div style="background: #e2e8f0; border-radius: 999px; height: 10px; margin-bottom: 1.5rem; overflow: hidden;">
+        <div style="height: 100%; width: {% widthratio progress total 100 %}%; background: var(--gradient-brand); border-radius: 999px; transition: width 0.4s ease;"></div>
+    </div>
+
+    <div class="card">
+        <p class="auth-slogan">Pregunta {{ progress }}</p>
+        <h1 class="card-title" style="font-size: 1.35rem;">{{ question.text }}</h1>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Vale hasta <strong>{{ question.points }} puntos</strong>. ¡Responde rápido para ganar más puntos!
+        </p>
+
+        <!-- Temporizador -->
+        <div style="margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+                <span>Tiempo restante</span>
+                <strong style="color: var(--primary-purple);" id="timer-text">--</strong>
+            </div>
+            <div style="background: #e2e8f0; border-radius: 999px; height: 10px; overflow: hidden;">
+                <div id="timer-bar" style="height: 100%; width: 100%; background: var(--gradient-brand); border-radius: 999px; transition: width 0.25s linear;"></div>
+            </div>
+        </div>
+
+        <form method="post" id="answer-form">
+            {% csrf_token %}
+            <input type="hidden" name="question_id" value="{{ question.pk }}">
+
+            <div style="display: grid; gap: 0.8rem;">
+                {% for key, text in question.get_options %}
+                <label style="display: flex; align-items: center; gap: 0.8rem; background: #f8fafc; border: 2px solid var(--border-color); border-radius: 12px; padding: 0.9rem 1.15rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--primary-purple)'; this.style.background='#f5f3ff';" onmouseout="this.style.borderColor='var(--border-color)'; this.style.background='#f8fafc';">
+                    <input type="radio" name="option" value="{{ key }}" required style="width: 18px; height: 18px; accent-color: var(--primary-purple); flex-shrink: 0;">
+                    <span style="font-weight: 600; color: var(--primary-purple); flex-shrink: 0;">{{ key }})</span>
+                    <span style="color: #334155;">{{ text }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <button type="submit" id="answer-btn" class="btn btn-primary" style="margin-top: 1.5rem;">
+                {% include 'includes/icons.html' with name='check' icon_class='icon' %} Responder
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    const timeLimit = {{ trivia.time_limit }};
+    const startedMs = {{ question_started_ms }};
+    const elapsed = Math.floor((Date.now() - startedMs) / 1000);
+    let remaining = Math.max(0, timeLimit - elapsed);
+
+    const bar = document.getElementById('timer-bar');
+    const text = document.getElementById('timer-text');
+    const form = document.getElementById('answer-form');
+    let lastTickSecond = null;
+
+    function render() {
+        bar.style.width = (remaining / timeLimit * 100) + '%';
+        text.textContent = remaining + 's';
+        if (remaining <= 5) {
+            text.style.color = '#dc2626';
+            bar.style.background = '#dc2626';
+        }
+        if (lastTickSecond !== remaining) {
+            lastTickSecond = remaining;
+            if (remaining <= 5) {
+                EduQuestSounds.tickUrgent();
+            } else {
+                EduQuestSounds.tick();
+            }
+        }
+    }
+    render();
+
+    const tick = setInterval(function () {
+        remaining -= 1;
+        if (remaining <= 0) {
+            clearInterval(tick);
+            bar.style.width = '0%';
+            text.textContent = '0s';
+            EduQuestSounds.timeout();
+            setTimeout(function () { form.submit(); }, 350);
+        } else {
+            render();
+        }
+    }, 1000);
+
+    form.addEventListener('submit', function () {
+        EduQuestSounds.click();
+    });
+})();
+</script>
+{% endblock %}

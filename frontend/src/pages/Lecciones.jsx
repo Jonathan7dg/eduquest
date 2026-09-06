@@ -203,6 +203,7 @@ export default function Lecciones() {
   const list = tab === 'lengua' ? lessons : rightsLessons
   const estadoDe = (lesson) => progreso[`${tab}-${lesson.number}`] || lesson.status
   const completadas = list.filter((l) => estadoDe(l) === 'completed').length
+  const enProgreso = list.filter((l) => estadoDe(l) === 'progress').length
   const pct = list.length ? Math.round((completadas / list.length) * 100) : 0
   const puntos = getPuntosUsuario(usuario)
 
@@ -226,8 +227,8 @@ export default function Lecciones() {
           <div className="absolute top-0 right-0 w-48 h-48 opacity-20 transform translate-x-4 -translate-y-4">
             <MatIcon name="star" className="text-9xl" />
           </div>
-          <div className="flex justify-center mb-6 z-10 relative">
-            <img className="w-40 h-auto object-contain drop-shadow-xl z-10 animate-float" alt="Edu, la mascota" src={mascotSidebar} />
+          <div className="relative flex justify-center mt-4">
+            <img className="w-48 h-auto object-contain drop-shadow-xl z-10 animate-float" alt="Edu, la mascota" src={mascotSidebar} />
           </div>
           <div className="z-10 bg-on-primary/10 rounded-xl p-4 mb-6">
             <nav className="flex flex-col gap-2">
@@ -331,8 +332,8 @@ export default function Lecciones() {
           {/* Featured Subject Card */}
           {tab === 'lengua' ? (
             <div className="bg-primary-fixed rounded-[24px] p-8 flex items-center justify-between relative overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-[1.01] cursor-pointer">
-              <div className="flex items-center gap-6 z-10">
-                <div className="w-20 h-20 bg-primary text-on-primary rounded-[20px] flex items-center justify-center text-5xl font-bold shadow-lg">
+              <div className="flex items-center gap-6 z-10 pr-2 max-w-[62%]">
+                <div className="w-20 h-20 bg-primary text-on-primary rounded-[20px] flex items-center justify-center text-5xl font-bold shadow-lg flex-shrink-0">
                   á
                 </div>
                 <div>
@@ -342,15 +343,15 @@ export default function Lecciones() {
                   </p>
                 </div>
               </div>
-              <div className="absolute right-0 bottom-0 h-full w-1/3 flex items-end justify-end">
-                <img className="h-[120%] object-contain -mr-10 -mb-4 z-10 animate-float" alt="Edu con lápiz" src={mascotPencil} />
+              <div className="absolute right-0 bottom-0 h-full w-[38%] max-w-[240px] flex items-end justify-end pointer-events-none">
+                <img className="h-[85%] object-contain z-10 animate-float" alt="Edu con lápiz" src={mascotPencil} />
                 <div className="absolute inset-0 bg-gradient-to-l from-white/20 to-transparent z-0 pointer-events-none"></div>
               </div>
             </div>
           ) : (
             <div className="bg-[#ede9fe] rounded-[24px] p-8 flex items-center justify-between relative overflow-hidden hover:shadow-lg transition-all duration-200 hover:scale-[1.01] cursor-pointer">
-              <div className="flex items-center gap-6 z-10">
-                <div className="w-20 h-20 bg-primary text-on-primary rounded-[20px] flex items-center justify-center shadow-lg">
+              <div className="flex items-center gap-6 z-10 pr-2 max-w-[62%]">
+                <div className="w-20 h-20 bg-primary text-on-primary rounded-[20px] flex items-center justify-center shadow-lg flex-shrink-0">
                   <MatIcon name="balance" className="text-5xl text-white" />
                 </div>
                 <div>
@@ -360,8 +361,8 @@ export default function Lecciones() {
                   </p>
                 </div>
               </div>
-              <div className="absolute right-0 bottom-0 h-full w-1/3 flex items-end justify-end">
-                <img className="h-[120%] object-contain -mr-10 -mb-4 z-10 animate-float" alt="Edu con lápiz" src={mascotPencil} />
+              <div className="absolute right-0 bottom-0 h-full w-[38%] max-w-[240px] flex items-end justify-end pointer-events-none">
+                <img className="h-[85%] object-contain z-10 animate-float" alt="Edu con lápiz" src={mascotPencil} />
                 <div className="absolute inset-0 bg-gradient-to-l from-white/20 to-transparent z-0 pointer-events-none"></div>
               </div>
             </div>
@@ -477,59 +478,70 @@ export default function Lecciones() {
         </main>
 
         {/* Right Sidebar */}
-        <aside className="hidden xl:flex flex-col w-[320px] gap-6 flex-shrink-0">
+        <aside className="hidden lg:flex flex-col w-[320px] gap-6 flex-shrink-0">
           {/* Progress Card */}
-          <div className="bg-[#0054cd] rounded-[24px] overflow-hidden text-white shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02] cursor-pointer">
-            <div className="p-4 bg-[#0054cd]">
-              <h3 className="font-label-lg text-label-lg">
+          <div className="bg-white rounded-[24px] overflow-hidden shadow-md border border-outline-variant/20">
+            <div className="p-5 bg-primary">
+              <h3 className="font-label-lg text-label-lg text-on-primary flex items-center gap-2">
+                <MatIcon name="monitoring" className="text-[20px] text-amber-300" />
                 {tab === 'lengua' ? 'Tu progreso en Acentuación' : 'Tu progreso en Derechos'}
               </h3>
             </div>
-            <div className="bg-surface-container-lowest text-on-surface p-6 rounded-t-[20px] -mt-2 flex items-center gap-6 border-t border-outline-variant/10 relative z-10">
-              <div className="relative w-24 h-24 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    className="text-surface-container-high stroke-current"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    strokeWidth="4"
-                  ></path>
-                  <path
-                    className="text-[#0054cd] stroke-current"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    strokeDasharray={`${pct}, 100`}
-                    strokeLinecap="round"
-                    strokeWidth="4"
-                  ></path>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-headline-lg font-headline-lg font-bold text-[#0054cd]">{pct}%</span>
-                  <span className="text-[10px] text-on-surface-variant uppercase tracking-wide">Completado</span>
+            <div className="bg-surface-container-lowest text-on-surface p-6 flex flex-col gap-5">
+              <div className="flex items-center gap-6">
+                <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path
+                      className="text-[#e6e8ea] stroke-current"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      strokeWidth="4"
+                      pathLength="100"
+                    ></path>
+                    <path
+                      className="text-primary stroke-current"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      strokeDasharray={`${pct} ${100 - pct}`}
+                      strokeLinecap="round"
+                      strokeWidth="4"
+                      pathLength="100"
+                    ></path>
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center px-1">
+                    <span className="text-2xl leading-none font-bold text-primary">{pct}%</span>
+                    <span className="text-[9px] text-on-surface-variant uppercase tracking-[0.08em] mt-0.5 leading-none">Completado</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4 flex-1">
+                  <div className="flex gap-2 items-start">
+                    <MatIcon name="library_add_check" className="text-primary text-lg mt-0.5" />
+                    <div>
+                      <p className="text-xs text-on-surface-variant">Lecciones completadas</p>
+                      <p className="font-label-lg text-label-lg font-bold">{completadas} / {list.length}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-start">
+                    <MatIcon name="hourglass_top" className="text-amber-500 text-lg mt-0.5" />
+                    <div>
+                      <p className="text-xs text-on-surface-variant">En progreso</p>
+                      <p className="font-label-lg text-label-lg font-bold">{enProgreso} / {list.length}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-4 flex-1">
-                <div className="flex gap-2 items-start">
-                  <MatIcon name="library_add_check" className="text-[#0054cd] text-lg mt-0.5" />
-                  <div>
-                    <p className="text-xs text-on-surface-variant">Lecciones completadas</p>
-                    <p className="font-label-lg text-label-lg font-bold">{completadas} / {list.length}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <MatIcon name="check_box" className="text-[#0054cd] text-lg mt-0.5" />
-                  <div>
-                    <p className="text-xs text-on-surface-variant">Actividades realizadas</p>
-                    <p className="font-label-lg text-label-lg font-bold">{completadas * 4} / {list.length * 4}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <MatIcon name="star" className="text-amber-400 text-lg mt-0.5" />
+              <div className="border-t border-outline-variant/15 pt-4 flex items-center justify-between">
+                <div className="flex gap-2 items-center">
+                  <MatIcon name="star" className="text-amber-400 text-xl" />
                   <div>
                     <p className="text-xs text-on-surface-variant">Estrellas ganadas</p>
                     <p className="font-label-lg text-label-lg font-bold">{puntos.toLocaleString('es')}</p>
                   </div>
                 </div>
+                <span className="inline-flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-full">
+                  <MatIcon name="trending_up" className="text-[16px]" />
+                  +{pct}%
+                </span>
               </div>
             </div>
           </div>
